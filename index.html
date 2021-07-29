@@ -15,33 +15,73 @@
     <div class="wrapper">
         <h2 class="title">Todo List App</h2>
         <div class="inputFields">
-            <input type="text" placeholder="Enter a task.">
-            <button type="submit" class="btn">
+            <input type="text" id="taskValue" placeholder="Enter a task.">
+            <button type="submit" id="addBtn" class="btn">
                 <i class="fa fa-plus"></i>
             </button>
         </div>
         <div class="content">
-            <ul>
-                <li>
-                    <span class="text"> Up vid</span>
-                    <i class="icon fa fa-trash"></i>
-                </li>
-                <li>
-                    <span class="text"> Up vid</span>
-                    <i class="icon fa fa-trash"></i>
-                </li>
-                <li>
-                    <span class="text"> Up vid</span>
-                    <i class="icon fa fa-trash"></i>
-                </li>
-                <li>
-                    <span class="text"> Up vid</span>
-                    <i class="icon fa fa-trash"></i>
-                </li>
-                <div class="pending-text">You have 4 pending tasks</div>
-            </ul>
+            <ul id="tasks"></ul>
         </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            //Show Tasks
+            function loadTasks() {
+                $.ajax({
+                    url: "show-tasks.php",
+                    type: "POST",
+                    success: function(data) {
+                        $("#tasks").html(data);
+                    }
+                });
+            }
+            loadTasks();
+
+            //Add task
+            $("#addBtn").on("click", function(e) {
+                e.preventDefault();
+                var task = $("#taskValue").val();
+
+                $.ajax({
+                    url: "add-task.php",
+                    type: "POST",
+                    data: {
+                        task: task
+                    },
+                    success: function(data) {
+                        loadTasks();
+                        $("#taskValue").val();
+                        if (data == 0) {
+                            alert("Something went wrong. Try again.");
+                        }
+                    }
+                });
+            });
+
+            //Remove Task
+            $(document).on("click", "#removeBtn", function(e) {
+                e.preventDefault();
+                var id = $(this).data('id');
+
+                $.ajax({
+                    url: "remove-task.php",
+                    type: "POST",
+                    data: {
+                        id: id
+                    },
+                    success: function(data) {
+                        loadTasks();
+                        if (data == 0) {
+                            alert("Something went wrong. Try again.");
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>
